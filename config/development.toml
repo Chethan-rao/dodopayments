@@ -1,0 +1,22 @@
+[server]
+host = "127.0.0.1"
+port = 3001
+
+[database]
+username = "db_user"
+password = "db_pass"
+host = "localhost"
+port = 5432
+dbname = "dodopayments"
+
+[log]
+log_level = "debug"
+log_format = "console"
+
+[cache]
+tti = 7200 # i.e. 2 hours
+max_capacity = 5000
+
+[limit]
+request_count = 30
+duration = 60
