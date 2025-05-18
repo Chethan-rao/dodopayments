@@ -7,7 +7,8 @@ use dodopayments::{app, configs, logger};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let configs = configs::Config::new().expect("Failed while parsing config");
 
-    let _log_guard = logger::setup_logging_pipeline(&configs.log);
+    let _log_guard =
+        logger::setup_logging_pipeline(&configs.log, [dodopayments::service_name!(), "tower_http"]);
 
     let app_state = app::AppState::new(configs)
         .await

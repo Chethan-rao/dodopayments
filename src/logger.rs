@@ -44,10 +44,13 @@ pub struct LogGuard {
     _log_guard: WorkerGuard,
 }
 
-pub fn setup_logging_pipeline(log_config: &LogConfig) -> LogGuard {
+pub fn setup_logging_pipeline(
+    log_config: &LogConfig,
+    crates_to_filter: impl AsRef<[&'static str]>,
+) -> LogGuard {
     let subscriber = tracing_subscriber::registry();
 
-    let console_filter = get_envfilter(LogLevel::Warn, log_config.log_level);
+    let console_filter = get_envfilter(LogLevel::Warn, log_config.log_level, crates_to_filter);
 
     let (non_blocking, guard) = tracing_appender::non_blocking(std::io::stdout());
 
@@ -84,11 +87,20 @@ macro_rules! workspace_members {
     };
 }
 
+#[macro_export]
+macro_rules! service_name {
+    () => {
+        std::env!("CARGO_BIN_NAME")
+    };
+}
+
 fn get_envfilter<'a>(
     default_log_level: impl Into<LevelFilter> + Copy,
     filter_log_level: impl Into<LevelFilter> + Copy,
+    crates_to_filter: impl AsRef<[&'a str]>,
 ) -> EnvFilter {
     let mut workspace_members = workspace_members!();
+    workspace_members.extend(crates_to_filter.as_ref());
 
     workspace_members
         .drain()

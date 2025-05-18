@@ -9,6 +9,7 @@ use crate::{
         ApiError,
         container::{ContainerError, ResultContainerExt},
     },
+    logger,
     routes::{api_models, auth::AuthResolver},
     storage::{
         UserInterface,
@@ -53,6 +54,8 @@ async fn sign_up(
         .await
         .change_error(ApiError::DatabaseInsertFailed("users"))?;
 
+    logger::info!("User created with user_id: {}", user.user_id);
+
     Ok(Json(user.into()))
 }
 
@@ -82,6 +85,8 @@ async fn login(
             "Failed to generate jwt token for user",
         ))?;
 
+    logger::info!("User logged in with user_id: {}", user.user_id);
+
     Ok(Json(api_models::LoginResponse {
         token,
         user_id: user.user_id,
@@ -97,6 +102,8 @@ async fn get_user_profile(
         .get_user_by_user_id(&user_info.user_id)
         .await
         .change_error(ApiError::NotFoundError("user"))?;
+
+    logger::info!("User profile fetched with user_id: {}", user.user_id);
 
     Ok(Json(user.into()))
 }
@@ -124,6 +131,8 @@ async fn update_user(
         )
         .await
         .change_error(ApiError::DatabaseUpdationFailed("users"))?;
+
+    logger::info!("User updated with user_id: {}", user.user_id);
 
     Ok(Json(updated_user.into()))
 }

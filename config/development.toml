@@ -4,7 +4,7 @@ port = 3001
 
 [database]
 username = "db_user"
-password = "db_pass"
+password = "db_pass"         # KMS encrypted
 host = "localhost"
 port = 5432
 dbname = "dodopayments"
@@ -14,7 +14,7 @@ log_level = "debug"
 log_format = "console"
 
 [cache]
-tti = 7200 # i.e. 2 hours
+tti = 7200                   # i.e. 2 hours
 max_capacity = 5000
 
 [limit]
@@ -22,4 +22,4 @@ request_count = 30
 duration = 60
 
 [secrets]
-jwt_secret = "secret"
+jwt_secret = "secret"        # KMS encrypted

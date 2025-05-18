@@ -58,29 +58,37 @@ where
         .nest(
             "/transaction",
             routes::transaction::serve(app_state.clone()),
-        )
-        .layer(ratelimit_middleware);
+        );
 
-    let router = router.layer(
-        tower_trace::TraceLayer::new_for_http()
-            .on_request(tower_trace::DefaultOnRequest::new().level(tracing::Level::INFO))
-            .on_response(
-                tower_trace::DefaultOnResponse::new()
-                    .level(tracing::Level::INFO)
-                    .latency_unit(tower_http::LatencyUnit::Micros),
-            )
-            .on_failure(
-                tower_trace::DefaultOnFailure::new()
-                    .latency_unit(tower_http::LatencyUnit::Micros)
-                    .level(tracing::Level::ERROR),
-            ),
-    );
+    let router = router
+        .layer(ratelimit_middleware)
+        .layer(
+            tower_trace::TraceLayer::new_for_http()
+                .on_request(tower_trace::DefaultOnRequest::new().level(tracing::Level::INFO))
+                .on_response(
+                    tower_trace::DefaultOnResponse::new()
+                        .level(tracing::Level::INFO)
+                        .latency_unit(tower_http::LatencyUnit::Micros),
+                )
+                .on_failure(
+                    tower_trace::DefaultOnFailure::new()
+                        .latency_unit(tower_http::LatencyUnit::Micros)
+                        .level(tracing::Level::ERROR),
+                ),
+        );
 
     let router = router
         .nest("/health", routes::health::serve())
         .with_state(app_state.clone());
 
-    logger::info!(startup_config=?app_state.config, "App started");
+    logger::debug!(
+        "App started: server: {:?}, db_name: {}, log: {:?},cache: {:?},limit: {:?}",
+        app_state.config.server,
+        app_state.config.database.dbname,
+        app_state.config.log,
+        app_state.config.cache,
+        app_state.config.limit
+    );
 
     let tcp_listener = tokio::net::TcpListener::bind(socket_addr).await?;
 
