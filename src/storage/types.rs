@@ -2,7 +2,7 @@ use diesel::{Identifiable, Insertable, Queryable};
 
 use super::schema;
 
-#[derive(Debug, Clone, Identifiable, Queryable, Insertable)]
+#[derive(Debug, Clone, Identifiable, Queryable)]
 #[diesel(table_name = schema::users)]
 pub struct User {
     pub id: i32,
@@ -10,7 +10,7 @@ pub struct User {
     pub email: String,
     pub name: String,
     pub password: String,
-    pub balance_in_rs: i64,
+    pub balance_in_rs: f64,
     pub created_at: time::PrimitiveDateTime,
     pub last_modified_at: time::PrimitiveDateTime,
 }
@@ -22,34 +22,32 @@ pub struct Transaction {
     pub transaction_id: String,
     pub sender_id: String,
     pub recipient_id: String,
-    pub amount_in_rs: i64,
+    pub amount_in_rs: f64,
     pub description: Option<String>,
     pub created_at: time::PrimitiveDateTime,
     pub status: String,
     pub updated_at: time::PrimitiveDateTime,
 }
 
-#[derive(Insertable)]
+#[derive(Debug, Insertable)]
 #[diesel(table_name = schema::users)]
-pub struct NewUser<'a> {
-    pub user_id: &'a str,
-    pub email: &'a str,
-    pub name: &'a str,
-    pub password: &'a str,
-    pub balance_in_rs: i64,
-    pub created_at: time::PrimitiveDateTime,
-    pub last_modified_at: time::PrimitiveDateTime,
+pub struct UserNew {
+    pub user_id: String,
+    pub email: String,
+    pub name: String,
+    pub password: String,
+    pub balance_in_rs: f64,
 }
 
 #[derive(Insertable)]
 #[diesel(table_name = schema::transactions)]
-pub struct NewTransaction<'a> {
-    pub transaction_id: &'a str,
-    pub sender_id: &'a str,
-    pub recipient_id: &'a str,
-    pub amount_in_rs: i64,
-    pub description: Option<&'a str>,
+pub struct NewTransaction {
+    pub transaction_id: String,
+    pub sender_id: String,
+    pub recipient_id: String,
+    pub amount_in_rs: f64,
+    pub description: Option<String>,
     pub created_at: time::PrimitiveDateTime,
-    pub status: &'a str,
+    pub status: String,
     pub updated_at: time::PrimitiveDateTime,
 }

@@ -9,6 +9,7 @@ pub struct Config {
     pub log: LogConfig,
     pub cache: Cache,
     pub limit: Limit,
+    pub secrets: Secrets,
 }
 
 #[derive(Clone, serde::Deserialize, Debug)]
@@ -41,6 +42,12 @@ pub struct Limit {
     pub request_count: u64,
     pub duration: u64,
     pub buffer_size: Option<usize>,
+}
+
+#[derive(Debug, serde::Deserialize, Clone)]
+pub struct Secrets {
+    // KMS encrypted
+    pub jwt_secret: String,
 }
 
 /// Get the origin directory of the project

@@ -15,7 +15,9 @@ use crate::{
 };
 
 pub mod caching;
+pub mod db;
 pub mod schema;
+pub mod transformers;
 pub mod types;
 
 /// Storage State that is to be passed though the application
@@ -74,4 +76,42 @@ impl Cacheable<types::User> for Storage {
 impl Cacheable<types::Transaction> for Storage {
     type Key = String;
     type Value = types::Transaction;
+}
+
+pub trait UserInterface {
+    type Error;
+
+    async fn get_user_by_user_id(
+        &self,
+        user_id: &str,
+    ) -> Result<types::User, ContainerError<Self::Error>>;
+    async fn get_user_by_email(
+        &self,
+        email: &str,
+    ) -> Result<types::User, ContainerError<Self::Error>>;
+    async fn create_user(
+        &self,
+        user: types::UserNew,
+    ) -> Result<types::User, ContainerError<Self::Error>>;
+    async fn update_user(
+        &self,
+        user: types::UserNew,
+    ) -> Result<types::User, ContainerError<Self::Error>>;
+}
+
+pub trait TransactionInterface {
+    type Error;
+
+    async fn get_transaction_by_id(
+        &self,
+        transaction_id: &str,
+    ) -> Result<types::Transaction, ContainerError<Self::Error>>;
+    async fn create_transaction(
+        &self,
+        transaction: types::NewTransaction,
+    ) -> Result<types::Transaction, ContainerError<Self::Error>>;
+    async fn update_transaction(
+        &self,
+        transaction: types::NewTransaction,
+    ) -> Result<types::Transaction, ContainerError<Self::Error>>;
 }

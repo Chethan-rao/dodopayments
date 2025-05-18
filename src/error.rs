@@ -49,15 +49,6 @@ pub enum ApiError {
     #[error("failed while retrieving stored data")]
     RetrieveDataFailed(&'static str),
 
-    #[error("failed to decrypt two custodian keys: {0}")]
-    DecryptingKeysFailed(&'static str),
-
-    #[error("failed in request middleware: {0}")]
-    RequestMiddlewareError(&'static str),
-
-    #[error("failed in response middleware: {0}")]
-    ResponseMiddlewareError(&'static str),
-
     #[error("Error while encoding data")]
     EncodingError,
 
@@ -70,14 +61,8 @@ pub enum ApiError {
     #[error("failed while deleting data from {0}")]
     DatabaseDeleteFailed(&'static str),
 
-    #[error("Failed while getting merchant from DB")]
-    MerchantError,
-
-    #[error("Something went wrong")]
-    UnknownError,
-
-    #[error("Error while encrypting with merchant key")]
-    MerchantKeyError,
+    #[error("Something went wrong: {0}")]
+    UnknownError(&'static str),
 
     #[error("Failed while connecting to database")]
     DatabaseError,
@@ -85,23 +70,11 @@ pub enum ApiError {
     #[error("Failed while validating request")]
     ValidationError,
 
-    #[error("Requested resource not found")]
-    NotFoundError,
+    #[error("Incorrect password")]
+    IncorrectPassword,
 
-    #[error("TTL is invalid")]
-    InvalidTtl,
-
-    #[error("Custodian is locked")]
-    CustodianLocked,
-
-    #[error("Custodian is already unlocked")]
-    CustodianUnlocked,
-
-    #[error("Tenant error: {0}")]
-    TenantError(&'static str),
-
-    #[error("Key manager error: {0}")]
-    KeyManagerError(&'static str),
+    #[error("Requested resource not found: {0}")]
+    NotFoundError(&'static str),
 }
 
 /// Error code constants.
@@ -122,24 +95,16 @@ mod error_codes {
 impl axum::response::IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
         match self {
-            Self::CustodianLocked => (
+            Self::IncorrectPassword => (
                 hyper::StatusCode::UNAUTHORIZED,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_00,
-                    "Custodian is locked".into(),
+                    "Incorrect password".into(),
                     None,
                 )),
             )
                 .into_response(),
-            Self::DecryptingKeysFailed(err) => (
-                hyper::StatusCode::UNAUTHORIZED,
-                axum::Json(ApiErrorResponse::new(
-                    error_codes::TE_00,
-                    format!("Failed while decrypting two custodian keys: {err}"),
-                    None,
-                )),
-            )
-                .into_response(),
+
             data @ Self::EncodingError => (
                 hyper::StatusCode::INTERNAL_SERVER_ERROR,
                 axum::Json(ApiErrorResponse::new(
@@ -149,14 +114,12 @@ impl axum::response::IntoResponse for ApiError {
                 )),
             )
                 .into_response(),
-            data @ Self::ResponseMiddlewareError(_)
-            | data @ Self::UnknownError
-            | data @ Self::MerchantKeyError
-            | data @ Self::KeyManagerError(_) => (
+
+            data @ Self::UnknownError(err) => (
                 hyper::StatusCode::INTERNAL_SERVER_ERROR,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_00,
-                    format!("{}", data),
+                    format!("{}", err),
                     None,
                 )),
             )
@@ -174,12 +137,7 @@ impl axum::response::IntoResponse for ApiError {
                 )),
             )
                 .into_response(),
-            data @ Self::RequestMiddlewareError(_)
-            | data @ Self::DecodingError
-            | data @ Self::ValidationError
-            | data @ Self::InvalidTtl
-            | data @ Self::CustodianUnlocked
-            | data @ Self::TenantError(_) => (
+            data @ Self::DecodingError | data @ Self::ValidationError => (
                 hyper::StatusCode::BAD_REQUEST,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_03,
@@ -188,17 +146,8 @@ impl axum::response::IntoResponse for ApiError {
                 )),
             )
                 .into_response(),
-            data @ Self::NotFoundError => (
+            data @ Self::NotFoundError(_) => (
                 hyper::StatusCode::NOT_FOUND,
-                axum::Json(ApiErrorResponse::new(
-                    error_codes::TE_02,
-                    format!("{}", data),
-                    None,
-                )),
-            )
-                .into_response(),
-            data @ Self::MerchantError => (
-                hyper::StatusCode::INTERNAL_SERVER_ERROR,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_02,
                     format!("{}", data),
@@ -234,4 +183,36 @@ impl ApiErrorResponse {
             data,
         }
     }
+}
+
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
+pub enum UserDbError {
+    #[error("Error while connecting to database")]
+    DBError,
+    #[error("Error while finding user record in the database")]
+    DBFilterError,
+    #[error("Error while inserting user record in the database")]
+    DBInsertError,
+    #[error("Error while updating user record in the database")]
+    DBUpdateError,
+    #[error("Unpredictable error occurred")]
+    UnknownError,
+    #[error("Element not found in storage")]
+    NotFoundError,
+}
+
+#[derive(Debug, thiserror::Error, Clone, PartialEq)]
+pub enum TransactionDbError {
+    #[error("Error while connecting to database")]
+    DBError,
+    #[error("Error while finding transaction record in the database")]
+    DBFilterError,
+    #[error("Error while inserting transaction record in the database")]
+    DBInsertError,
+    #[error("Error while updating transaction record in the database")]
+    DBUpdateError,
+    #[error("Unpredictable error occurred")]
+    UnknownError,
+    #[error("Element not found in storage")]
+    NotFoundError,
 }

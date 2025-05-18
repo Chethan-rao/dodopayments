@@ -20,3 +20,6 @@ max_capacity = 5000
 [limit]
 request_count = 30
 duration = 60
+
+[secrets]
+jwt_secret = "secret"

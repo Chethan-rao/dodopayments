@@ -9,7 +9,7 @@ diesel::table! {
         sender_id -> Varchar,
         #[max_length = 64]
         recipient_id -> Varchar,
-        amount_in_rs -> Int8,
+        amount_in_rs -> Float8,
         description -> Nullable<Text>,
         created_at -> Timestamp,
         #[max_length = 32]
@@ -29,7 +29,7 @@ diesel::table! {
         name -> Varchar,
         #[max_length = 255]
         password -> Varchar,
-        balance_in_rs -> Int8,
+        balance_in_rs -> Float8,
         created_at -> Timestamp,
         last_modified_at -> Timestamp,
     }

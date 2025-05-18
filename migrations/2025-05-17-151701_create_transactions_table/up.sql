@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     transaction_id VARCHAR(64) NOT NULL UNIQUE,
     sender_id VARCHAR(64) NOT NULL,  
     recipient_id VARCHAR(64) NOT NULL, 
-    amount_in_rs BIGINT NOT NULL, 
+    amount_in_rs DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     description TEXT, 
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     status VARCHAR(32) NOT NULL DEFAULT 'pending', 

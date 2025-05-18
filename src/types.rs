@@ -1,12 +1,20 @@
 use error_stack::report;
+use jsonwebtoken::{EncodingKey, Header, encode};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    error::{ValidationError, container::ContainerError},
+    error::{
+        ValidationError,
+        container::{ContainerError, ResultContainerExt},
+    },
     logger,
+    routes::user::error::UserError,
 };
+
+pub const MAX_PASSWORD_LENGTH: usize = 70;
+pub const MIN_PASSWORD_LENGTH: usize = 8;
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Email(pub String);
@@ -54,4 +62,58 @@ impl Email {
 
         Ok(())
     }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct Password(pub String);
+
+impl Password {
+    pub fn new(password: String) -> Self {
+        Self(password)
+    }
+
+    pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
+        let password = &self.0;
+
+        let mut has_upper_case = false;
+        let mut has_lower_case = false;
+        let mut has_numeric_value = false;
+        let mut has_special_character = false;
+        let mut has_whitespace = false;
+
+        for c in password.chars() {
+            has_upper_case = has_upper_case || c.is_uppercase();
+            has_lower_case = has_lower_case || c.is_lowercase();
+            has_numeric_value = has_numeric_value || c.is_numeric();
+            has_special_character = has_special_character || !c.is_alphanumeric();
+            has_whitespace = has_whitespace || c.is_whitespace();
+        }
+
+        let is_password_format_valid = has_upper_case
+            && has_lower_case
+            && has_numeric_value
+            && has_special_character
+            && !has_whitespace;
+
+        let is_too_long = password.chars().count() > MAX_PASSWORD_LENGTH;
+        let is_too_short = password.chars().count() < MIN_PASSWORD_LENGTH;
+
+        if is_too_short || is_too_long || !is_password_format_valid {
+            return Err(ValidationError::IncorrectValueProvided {
+                field_name: "password",
+            }
+            .into());
+        }
+
+        Ok(())
+    }
+}
+
+// Define the claims structure, including user information.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Claims {
+    pub user_id: String,
+    pub email: String,
+    pub name: String,
+    pub exp: u64,
 }
