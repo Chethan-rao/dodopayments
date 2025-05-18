@@ -51,3 +51,16 @@ impl TryFrom<&storage::types::User> for Claims {
         })
     }
 }
+
+impl From<storage::types::User> for api_models::GetUserResponse {
+    fn from(value: storage::types::User) -> Self {
+        Self {
+            user_id: value.user_id,
+            email: value.email,
+            name: value.name,
+            balance_in_rs: value.balance_in_rs,
+            created_at: value.created_at.to_string(),
+            last_modified_at: value.last_modified_at.to_string(),
+        }
+    }
+}

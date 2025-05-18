@@ -9,7 +9,7 @@ use crate::{
         ApiError,
         container::{ContainerError, ResultContainerExt},
     },
-    routes::api_models,
+    routes::{api_models, auth::AuthResolver},
     storage::{
         UserInterface,
         types::{User, UserNew},
@@ -23,13 +23,15 @@ use axum::{
     routing::{get, post, put},
 };
 use error_stack::ResultExt;
+use hyper::HeaderMap;
 
 use crate::app::AppState;
 
 pub fn serve(app_state: Arc<AppState>) -> axum::Router<Arc<AppState>> {
     let router = axum::Router::new()
         .route("/signup", post(sign_up))
-        .route("/login", post(login));
+        .route("/login", post(login))
+        .route("/", get(get_user_profile));
     // .route("/:user_id", put(update_user_profile));
 
     router
@@ -85,3 +87,17 @@ async fn login(
         user_id: user.user_id,
     }))
 }
+
+async fn get_user_profile(
+    State(app_state): State<Arc<AppState>>,
+    AuthResolver(user_info): AuthResolver,
+) -> Result<Json<api_models::GetUserResponse>, ContainerError<ApiError>> {
+    let user = app_state
+        .db
+        .get_user_by_user_id(&user_info.user_id)
+        .await
+        .change_error(ApiError::NotFoundError("user"))?;
+
+    Ok(Json(user.into()))
+}
+

@@ -75,6 +75,12 @@ pub enum ApiError {
 
     #[error("Requested resource not found: {0}")]
     NotFoundError(&'static str),
+
+    #[error("The request source is un-authenticated")]
+    UnAuthenticated,
+
+    #[error("Failed to parse headers: {0}")]
+    HeadersError(&'static str),
 }
 
 /// Error code constants.
@@ -95,11 +101,11 @@ mod error_codes {
 impl axum::response::IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
         match self {
-            Self::IncorrectPassword => (
+            data @ Self::IncorrectPassword | data @ Self::UnAuthenticated => (
                 hyper::StatusCode::UNAUTHORIZED,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_00,
-                    "Incorrect password".into(),
+                    format!("{}", data),
                     None,
                 )),
             )
@@ -115,11 +121,11 @@ impl axum::response::IntoResponse for ApiError {
             )
                 .into_response(),
 
-            data @ Self::UnknownError(err) => (
+            data @ Self::UnknownError(_) => (
                 hyper::StatusCode::INTERNAL_SERVER_ERROR,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_00,
-                    format!("{}", err),
+                    format!("{}", data),
                     None,
                 )),
             )
@@ -137,7 +143,9 @@ impl axum::response::IntoResponse for ApiError {
                 )),
             )
                 .into_response(),
-            data @ Self::DecodingError | data @ Self::ValidationError => (
+            data @ Self::DecodingError
+            | data @ Self::ValidationError
+            | data @ Self::HeadersError(_) => (
                 hyper::StatusCode::BAD_REQUEST,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_03,

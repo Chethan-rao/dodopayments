@@ -110,7 +110,7 @@ impl Password {
 }
 
 // Define the claims structure, including user information.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct Claims {
     pub user_id: String,
     pub email: String,

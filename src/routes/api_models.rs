@@ -55,3 +55,13 @@ pub struct LoginResponse {
     pub token: String,
     pub user_id: String,
 }
+
+#[derive(Serialize, Default, Deserialize, Debug)]
+pub struct GetUserResponse {
+    pub user_id: String,
+    pub email: String,
+    pub name: String,
+    pub balance_in_rs: f64,
+    pub created_at: String,
+    pub last_modified_at: String,
+}
