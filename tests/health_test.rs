@@ -8,14 +8,17 @@ mod tests {
     };
     use tower::ServiceExt;
 
+    /// Handler for the health check route.
     async fn health_check() -> StatusCode {
         StatusCode::OK
     }
 
+    /// Creates the application router.
     fn app() -> Router {
         Router::new().route("/health", get(health_check))
     }
 
+    /// Tests the health check route.
     #[tokio::test]
     async fn health_check_route() {
         let app = app();

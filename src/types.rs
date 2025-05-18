@@ -8,17 +8,22 @@ use crate::{
     logger,
 };
 
+/// Maximum password length.
 pub const MAX_PASSWORD_LENGTH: usize = 70;
+/// Minimum password length.
 pub const MIN_PASSWORD_LENGTH: usize = 8;
 
+/// Represents an email address.
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct Email(pub String);
 
 impl Email {
+    /// Creates a new Email.
     pub fn new(email: String) -> Self {
         Self(email)
     }
 
+    /// Validates the email address.
     pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
         let email = &self.0;
         static EMAIL_REGEX: Lazy<Option<Regex>> = Lazy::new(|| {
@@ -32,13 +37,15 @@ impl Email {
                 }
             }
         });
-        let email_regex = match EMAIL_REGEX.as_ref() {
-            Some(regex) => Ok::<Regex, ValidationError>(regex.clone()),
-            None => Err(ValidationError::InvalidValue {
-                message: "Invalid regex expression".into(),
+       let email_regex = match EMAIL_REGEX.as_ref() {
+            Some(regex) => regex.clone(),
+            None => {
+                return Err(ValidationError::InvalidValue {
+                    message: "Invalid regex expression".into(),
+                }
+                .into());
             }
-            .into()),
-        }?;
+        };
 
         const EMAIL_MAX_LENGTH: usize = 319;
         if email.is_empty() || email.chars().count() > EMAIL_MAX_LENGTH {
@@ -59,14 +66,17 @@ impl Email {
     }
 }
 
+/// Represents a password.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Password(pub String);
 
 impl Password {
+    /// Creates a new Password.
     pub fn new(password: String) -> Self {
         Self(password)
     }
 
+    /// Validates the password.
     pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
         let password = &self.0;
 
@@ -104,7 +114,7 @@ impl Password {
     }
 }
 
-// Define the claims structure, including user information.
+/// Define the claims structure, including user information.
 #[derive(Debug, Serialize, Clone, Deserialize)]
 pub struct Claims {
     pub user_id: String,

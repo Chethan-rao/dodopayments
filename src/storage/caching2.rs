@@ -112,8 +112,8 @@ where
     /// Implements the cache.
     pub fn implement_cache(config: &'_ crate::configs::Cache) -> impl Fn(T) -> Self + '_ {
         move |inner: T| {
-            let user_cache = new_cache::<T, types::User>(config, "user");
-            let txn_cache = new_cache::<T, types::Transaction>(config, "transaction");
+            let user_cache = new_cache<T, types::User>(config, "user");
+            let txn_cache = new_cache<T, types::Transaction>(config, "transaction");
 
             Self {
                 inner,
@@ -123,6 +123,3 @@ where
         }
     }
 }
-
-// pub mod user;
-// pub mod transaction;

@@ -14,6 +14,7 @@ use crate::{
     types::Claims,
 };
 
+/// Struct for resolving authentication.
 #[derive(Clone)]
 pub struct AuthResolver(pub Claims);
 
@@ -33,6 +34,7 @@ impl FromRequestParts<Arc<AppState>> for AuthResolver {
     }
 }
 
+/// Authenticates the JWT key from the headers.
 async fn authenticate_jwt_key(
     state: &Arc<AppState>,
     headers: &HeaderMap,
@@ -63,6 +65,7 @@ async fn authenticate_jwt_key(
     }
 }
 
+/// Decodes the JWT token.
 async fn decode_jwt(
     token: &str,
     state: &Arc<AppState>,

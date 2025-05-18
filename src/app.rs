@@ -12,18 +12,21 @@ use crate::{
 
 const BUFFER_LIMIT: usize = 1024;
 
+/// Handles rate limiting errors.
 async fn ratelimit_err_handler(_: axum::BoxError) -> impl IntoResponse {
     (hyper::StatusCode::TOO_MANY_REQUESTS, "Rate Limit Applied")
 }
 
 type Storage = Caching<storage::Storage>;
 
+/// Represents the application state.
 pub struct AppState {
     pub db: Storage,
     pub config: Config,
 }
 
 impl AppState {
+    /// Creates a new AppState instance.
     pub async fn new(config: Config) -> error_stack::Result<Self, error::ConfigurationError> {
         #[allow(clippy::map_identity)]
         let db = storage::Storage::new(&config.database)
@@ -35,6 +38,7 @@ impl AppState {
     }
 }
 
+/// Builds and starts the server.
 pub async fn server_builder(app_state: Arc<AppState>) -> Result<(), error::ConfigurationError>
 where
 {

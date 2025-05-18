@@ -5,26 +5,38 @@ pub use tracing::{debug, error, info, trace, warn};
 use tracing_appender::non_blocking::WorkerGuard;
 use tracing_subscriber::{EnvFilter, Layer, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
+/// Represents the logging configuration.
 #[derive(Deserialize, Debug, Clone)]
 pub struct LogConfig {
+    /// The log level.
     pub log_level: LogLevel,
+    /// The log format.
     pub log_format: LogFormat,
 }
 
+/// Represents the log level.
 #[derive(Deserialize, Debug, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum LogLevel {
+    /// Debug log level.
     Debug,
+    /// Info log level.
     Info,
+    /// Warn log level.
     Warn,
+    /// Error log level.
     Error,
+    /// Off log level.
     Off,
 }
 
+/// Represents the log format.
 #[derive(Deserialize, Debug, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum LogFormat {
+    /// Console log format.
     Console,
+    /// JSON log format.
     Json,
 }
 
@@ -40,10 +52,12 @@ impl From<LogLevel> for LevelFilter {
     }
 }
 
+/// Struct to hold the log guard.
 pub struct LogGuard {
     _log_guard: WorkerGuard,
 }
 
+/// Sets up the logging pipeline.
 pub fn setup_logging_pipeline(
     log_config: &LogConfig,
     crates_to_filter: impl AsRef<[&'static str]>,
@@ -84,13 +98,6 @@ macro_rules! workspace_members {
         std::env!("CARGO_WORKSPACE_MEMBERS")
             .split(",")
             .collect::<std::collections::HashSet<&'static str>>()
-    };
-}
-
-#[macro_export]
-macro_rules! service_name {
-    () => {
-        std::env!("CARGO_BIN_NAME")
     };
 }
 

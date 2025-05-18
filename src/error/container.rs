@@ -1,10 +1,12 @@
 use std::error::Error;
 
+/// A container for errors.
 pub struct ContainerError<E> {
     pub(crate) error: error_stack::Report<E>,
 }
 
 impl<E: Sync + Send + 'static> ContainerError<E> {
+    /// Gets the inner error.
     pub fn get_inner(&self) -> &E {
         self.error.current_context()
     }

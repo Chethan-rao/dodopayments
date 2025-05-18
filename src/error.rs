@@ -2,6 +2,7 @@ use crate::error::container::ContainerError;
 
 pub mod container;
 
+/// Represents configuration-related errors.
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigurationError {
     #[error("error while creating the webserver")]
@@ -16,6 +17,7 @@ pub enum ConfigurationError {
     InvalidConfigurationValueError(String),
 }
 
+/// Represents validation-related errors.
 #[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum ValidationError {
     #[error("Missing required field: {field_name}")]
@@ -28,6 +30,7 @@ pub enum ValidationError {
     InvalidValue { message: String },
 }
 
+/// Represents storage-related errors.
 #[derive(Debug, thiserror::Error)]
 pub enum StorageError {
     #[error("failed to construct database pool")]
@@ -44,6 +47,7 @@ pub enum StorageError {
     NotFoundError,
 }
 
+/// Represents API-related errors.
 #[derive(Debug, Copy, Clone, thiserror::Error)]
 pub enum ApiError {
     #[error("failed while retrieving stored data")]
@@ -180,6 +184,7 @@ impl<T: axum::response::IntoResponse + error_stack::Context + Copy> axum::respon
     }
 }
 
+/// Represents the structure of an API error response.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ApiErrorResponse {
     code: &'static str,
@@ -188,6 +193,7 @@ pub struct ApiErrorResponse {
 }
 
 impl ApiErrorResponse {
+    /// Creates a new ApiErrorResponse.
     fn new(code: &'static str, message: String, data: Option<serde_json::Value>) -> Self {
         Self {
             code,
@@ -197,6 +203,7 @@ impl ApiErrorResponse {
     }
 }
 
+/// Represents user database-related errors.
 #[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum UserDbError {
     #[error("Error while connecting to database")]
@@ -213,6 +220,7 @@ pub enum UserDbError {
     NotFoundError,
 }
 
+/// Represents transaction database-related errors.
 #[derive(Debug, thiserror::Error, Clone, PartialEq)]
 pub enum TransactionDbError {
     #[error("Error while connecting to database")]

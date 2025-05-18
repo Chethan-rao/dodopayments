@@ -5,6 +5,7 @@ use crate::{
     types::{Email, Password},
 };
 
+/// Represents the sign-up request body.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SignUpRequest {
     pub name: String,
@@ -13,6 +14,7 @@ pub struct SignUpRequest {
 }
 
 impl SignUpRequest {
+    /// Validates the sign-up request.
     pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
         self.email.validate()?;
         self.password.validate()?;
@@ -27,6 +29,7 @@ impl SignUpRequest {
     }
 }
 
+/// Represents the sign-up response body.
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct SignUpResponse {
     pub user_id: String,
@@ -35,6 +38,7 @@ pub struct SignUpResponse {
     pub created_at: String,
 }
 
+/// Represents the login request body.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LoginRequest {
     pub email: Email,
@@ -42,6 +46,7 @@ pub struct LoginRequest {
 }
 
 impl LoginRequest {
+    /// Validates the login request.
     pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
         self.email.validate()?;
         self.password.validate()?;
@@ -50,12 +55,14 @@ impl LoginRequest {
     }
 }
 
+/// Represents the login response body.
 #[derive(Serialize, Default, Deserialize, Debug)]
 pub struct LoginResponse {
     pub token: String,
     pub user_id: String,
 }
 
+/// Represents the get user response body.
 #[derive(Serialize, Default, Deserialize, Debug)]
 pub struct GetUserResponse {
     pub user_id: String,
@@ -66,6 +73,7 @@ pub struct GetUserResponse {
     pub last_modified_at: String,
 }
 
+/// Represents the update user request body.
 #[derive(Serialize, Default, Deserialize, Debug)]
 pub struct UpdateUserRequest {
     pub name: Option<String>,
@@ -73,6 +81,7 @@ pub struct UpdateUserRequest {
 }
 
 impl UpdateUserRequest {
+    /// Validates the update user request.
     pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
         if self.name.is_none() && self.amount.is_none() {
             return Err(ValidationError::InvalidValue {
@@ -102,6 +111,7 @@ impl UpdateUserRequest {
     }
 }
 
+/// Represents the update user response body.
 #[derive(Serialize, Default, Deserialize, Debug)]
 pub struct UpdateUserResponse {
     pub user_id: String,

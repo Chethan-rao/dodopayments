@@ -4,6 +4,7 @@ mod tests {
     use dodopayments::utils::{generate_jwt};
     use serde::Serialize;
 
+    /// Tests password hash generation.
     #[tokio::test]
     async fn test_generate_password_hash() {
         let password = "Password123!".to_string();
@@ -11,6 +12,7 @@ mod tests {
         assert!(hash_result.is_ok());
     }
 
+    /// Tests password correctness verification.
     #[tokio::test]
     async fn test_is_correct_password() {
         let password = "Password123!".to_string();
@@ -22,6 +24,7 @@ mod tests {
         assert!(!is_incorrect);
     }
 
+    /// Tests JWT generation.
     #[tokio::test]
     async fn test_generate_jwt() {
         use serde::Serialize;

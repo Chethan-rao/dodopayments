@@ -9,6 +9,7 @@ use crate::{
     routes::user::error::UserError,
 };
 
+/// Generates a password hash using Argon2.
 pub fn generate_password_hash(password: String) -> Result<String, ContainerError<UserError>> {
     let salt = SaltString::generate(&mut OsRng);
 
@@ -19,6 +20,7 @@ pub fn generate_password_hash(password: String) -> Result<String, ContainerError
     Ok(password_hash.to_string())
 }
 
+/// Verifies if the candidate password is correct.
 pub fn is_correct_password(
     candidate: &String,
     password: &String,

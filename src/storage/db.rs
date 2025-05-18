@@ -10,9 +10,11 @@ use crate::{
     storage::{Storage, UserInterface,  types},
 };
 
+/// Implementation of the UserInterface for the Storage struct.
 impl UserInterface for Storage {
     type Error = UserDbError;
 
+    /// Retrieves a user by their user ID.
     async fn get_user_by_user_id(
         &self,
         _user_id: &str,
@@ -40,6 +42,7 @@ impl UserInterface for Storage {
         output
     }
 
+    /// Retrieves a user by their email address.
     async fn get_user_by_email(
         &self,
         _email: &str,
@@ -67,6 +70,7 @@ impl UserInterface for Storage {
         output
     }
 
+    /// Creates a new user in the database.
     async fn create_user(
         &self,
         user: super::types::UserNew,
@@ -83,6 +87,7 @@ impl UserInterface for Storage {
             .change_error(UserDbError::DBInsertError)?)
     }
 
+    /// Updates an existing user in the database.
     async fn update_user(
         &self,
         _user_id: &str,

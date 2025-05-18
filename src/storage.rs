@@ -63,8 +63,11 @@ impl Storage {
     }
 }
 
+/// Trait for cacheable tables
 pub trait Cacheable<Table> {
+    /// The key type for the cache
     type Key: std::hash::Hash + Eq + PartialEq + Send + Sync + 'static;
+    /// The value type for the cache
     type Value: Clone + Send + Sync + 'static;
 }
 
@@ -78,21 +81,27 @@ impl Cacheable<types::Transaction> for Storage {
     type Value = types::Transaction;
 }
 
+/// User Interface
 pub trait UserInterface {
+    /// Error type
     type Error;
 
+    /// Get user by user id
     async fn get_user_by_user_id(
         &self,
         user_id: &str,
     ) -> Result<types::User, ContainerError<Self::Error>>;
+    /// Get user by email
     async fn get_user_by_email(
         &self,
         email: &str,
     ) -> Result<types::User, ContainerError<Self::Error>>;
+    /// Create user
     async fn create_user(
         &self,
         user: types::UserNew,
     ) -> Result<types::User, ContainerError<Self::Error>>;
+    /// Update user
     async fn update_user(
         &self,
         user_id: &str,
@@ -100,17 +109,22 @@ pub trait UserInterface {
     ) -> Result<types::User, ContainerError<Self::Error>>;
 }
 
+/// Transaction Interface
 pub trait TransactionInterface {
+    /// Error type
     type Error;
 
+    /// Get transaction by id
     async fn get_transaction_by_id(
         &self,
         transaction_id: &str,
     ) -> Result<types::Transaction, ContainerError<Self::Error>>;
+    /// Create transaction
     async fn create_transaction(
         &self,
         transaction: types::NewTransaction,
     ) -> Result<types::Transaction, ContainerError<Self::Error>>;
+    /// Update transaction
     async fn update_transaction(
         &self,
         transaction: types::NewTransaction,

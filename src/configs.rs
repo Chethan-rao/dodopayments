@@ -2,51 +2,73 @@ use std::path::PathBuf;
 
 use crate::logger::LogConfig;
 
+/// Represents the application configuration.
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Config {
+    /// Server configuration.
     pub server: Server,
+    /// Database configuration.
     pub database: Database,
+    /// Logging configuration.
     pub log: LogConfig,
+    /// Cache configuration.
     pub cache: Cache,
+    /// Rate limiting configuration.
     pub limit: Limit,
+    /// Secrets configuration.
     pub secrets: Secrets,
 }
 
+/// Represents the server configuration.
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Server {
+    /// The host address.
     pub host: String,
+    /// The port number.
     pub port: u16,
 }
 
+/// Represents the database configuration.
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Database {
+    /// The database username.
     pub username: String,
-    // KMS encrypted
+    /// KMS encrypted password.
     pub password: String,
+    /// The database host address.
     pub host: String,
+    /// The database port number.
     pub port: u16,
+    /// The database name.
     pub dbname: String,
+    /// The database pool size.
     pub pool_size: Option<usize>,
 }
 
+/// Represents the cache configuration.
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Cache {
-    // time to idle (in secs)
+    /// Time to idle (in seconds).
     pub tti: Option<u64>,
-    // maximum capacity of the cache
+    /// Maximum capacity of the cache.
     pub max_capacity: u64,
 }
 
+/// Represents the rate limiting configuration.
 #[derive(Clone, serde::Deserialize, Debug)]
 pub struct Limit {
+    /// The number of requests allowed.
     pub request_count: u64,
+    /// The duration (in seconds) for the rate limit.
     pub duration: u64,
+    /// The buffer size.
     pub buffer_size: Option<usize>,
 }
 
+/// Represents the secrets configuration.
 #[derive(Debug, serde::Deserialize, Clone)]
 pub struct Secrets {
-    // KMS encrypted
+    /// KMS encrypted JWT secret.
     pub jwt_secret: String,
 }
 
@@ -83,6 +105,7 @@ impl Config {
         })
     }
 
+    /// Creates a new configuration builder.
     pub fn builder(
         environment: &Env,
     ) -> Result<config::ConfigBuilder<config::builder::DefaultState>, config::ConfigError> {
@@ -110,13 +133,17 @@ impl Config {
     }
 }
 
+/// Represents the environment.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Env {
+    /// Development environment.
     Development,
+    /// Release environment.
     Release,
 }
 
 impl Env {
+    /// Gets the current environment.
     pub const fn current_env() -> Self {
         if cfg!(debug_assertions) {
             Self::Development
@@ -125,6 +152,7 @@ impl Env {
         }
     }
 
+    /// Gets the configuration path for the environment.
     pub const fn config_path(self) -> &'static str {
         match self {
             Self::Development => "development.toml",

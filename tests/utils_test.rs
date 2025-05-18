@@ -2,6 +2,7 @@
 mod tests {
     use dodopayments::utils::generate_jwt;
 
+    /// Tests for the utils module.
     #[test]
     fn test_generate_jwt() {
         use serde::Serialize;

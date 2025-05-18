@@ -4,6 +4,7 @@ use crate::utils;
 
 use super::schema;
 
+/// Represents a user in the database.
 #[derive(Debug, Clone, Identifiable, Queryable)]
 #[diesel(table_name = schema::users)]
 pub struct User {
@@ -17,6 +18,7 @@ pub struct User {
     pub last_modified_at: time::PrimitiveDateTime,
 }
 
+/// Represents a transaction in the database.
 #[derive(Debug, Clone, Identifiable, Queryable, Insertable)]
 #[diesel(table_name = schema::transactions)]
 pub struct Transaction {
@@ -31,6 +33,7 @@ pub struct Transaction {
     pub updated_at: time::PrimitiveDateTime,
 }
 
+/// Represents a new user to be inserted into the database.
 #[derive(Debug, Insertable)]
 #[diesel(table_name = schema::users)]
 pub struct UserNew {
@@ -41,6 +44,7 @@ pub struct UserNew {
     pub balance_in_rs: f64,
 }
 
+/// Represents a new transaction to be inserted into the database.
 #[derive(Insertable)]
 #[diesel(table_name = schema::transactions)]
 pub struct NewTransaction {
@@ -54,6 +58,7 @@ pub struct NewTransaction {
     pub updated_at: time::PrimitiveDateTime,
 }
 
+/// Represents user data to be updated in the database.
 #[derive(Clone, Debug, AsChangeset)]
 #[diesel(table_name = schema::users)]
 pub struct UserUpdateInternal {
@@ -63,6 +68,7 @@ pub struct UserUpdateInternal {
 }
 
 impl UserUpdateInternal {
+    /// Creates a new UserUpdateInternal instance.
     pub fn new(name: Option<String>, amount_in_rs: Option<f64>) -> Self {
         let last_modified_at = utils::datetime::now();
         Self {

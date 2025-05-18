@@ -23,10 +23,9 @@ use axum::{
     routing::{get, post, put},
 };
 
-
-
 use crate::app::AppState;
 
+/// Serves the user routes.
 pub fn serve(_app_state: Arc<AppState>) -> axum::Router<Arc<AppState>> {
     let router = axum::Router::new()
         .route("/signup", post(sign_up))
@@ -37,6 +36,7 @@ pub fn serve(_app_state: Arc<AppState>) -> axum::Router<Arc<AppState>> {
     router
 }
 
+/// Handles the sign-up request.
 async fn sign_up(
     State(app_state): State<Arc<AppState>>,
     Json(new_user_request): Json<api_models::SignUpRequest>,
@@ -58,6 +58,7 @@ async fn sign_up(
     Ok(Json(user.into()))
 }
 
+/// Handles the login request.
 async fn login(
     State(app_state): State<Arc<AppState>>,
     Json(login_request): Json<api_models::LoginRequest>,
@@ -92,6 +93,7 @@ async fn login(
     }))
 }
 
+/// Handles the get user profile request.
 async fn get_user_profile(
     State(app_state): State<Arc<AppState>>,
     AuthResolver(user_info): AuthResolver,
@@ -107,6 +109,7 @@ async fn get_user_profile(
     Ok(Json(user.into()))
 }
 
+/// Handles the update user request.
 async fn update_user(
     State(app_state): State<Arc<AppState>>,
     AuthResolver(user_info): AuthResolver,
