@@ -86,6 +86,9 @@ pub enum ApiError {
     #[error("The request source is un-authenticated")]
     UnAuthenticated,
 
+    #[error("Transaction database error")]
+    TransactionDatabaseError,
+
     #[error("Failed to parse headers: {0}")]
     HeadersError(&'static str),
 }
@@ -166,6 +169,15 @@ impl axum::response::IntoResponse for ApiError {
                 hyper::StatusCode::NOT_FOUND,
                 axum::Json(ApiErrorResponse::new(
                     error_codes::TE_02,
+                    format!("{}", data),
+                    None,
+                )),
+            )
+                .into_response(),
+            data @ Self::TransactionDatabaseError => (
+                hyper::StatusCode::INTERNAL_SERVER_ERROR,
+                axum::Json(ApiErrorResponse::new(
+                    error_codes::TE_01,
                     format!("{}", data),
                     None,
                 )),

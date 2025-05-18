@@ -118,3 +118,66 @@ pub struct UpdateUserResponse {
     pub name: String,
     pub balance_in_rs: f64,
 }
+
+/// Represents the create transaction request body.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct CreateTransactionRequest {
+    pub sender_id: String,
+    pub receiver_id: String,
+    pub amount: f64,
+}
+
+impl CreateTransactionRequest {
+    /// Validates the create transaction request.
+    pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
+        if self.sender_id.is_empty() {
+            return Err(ValidationError::InvalidValue {
+                message: "Sender ID cannot be empty".into(),
+            }
+            .into());
+        }
+
+        if self.receiver_id.is_empty() {
+            return Err(ValidationError::InvalidValue {
+                message: "Receiver ID cannot be empty".into(),
+            }
+            .into());
+        }
+
+        if self.amount <= 0.0 {
+            return Err(ValidationError::InvalidValue {
+                message: "Amount must be greater than zero".into(),
+            }
+            .into());
+        }
+
+        Ok(())
+    }
+}
+
+/// Represents the get transaction response body.
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct GetTransactionResponse {
+    pub transaction_id: String,
+    pub sender_id: String,
+    pub receiver_id: String,
+    pub amount: f64,
+    pub created_at: String,
+}
+
+/// Represents the list transactions request query parameters.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ListTransactionsRequest {
+    pub user_id: String,
+    pub page: Option<u64>,
+    pub page_size: Option<u64>,
+}
+
+/// Represents the list transactions response body.
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct ListTransactionsResponse {
+    pub transactions: Vec<GetTransactionResponse>,
+    pub total_count: u64,
+    pub page: u64,
+    pub page_size: u64,
+}
