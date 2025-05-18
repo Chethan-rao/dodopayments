@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use axum::{error_handling::HandleErrorLayer, response::IntoResponse};
 use error_stack::ResultExt;
-use tower_http::trace as tower_trace;
+use tower_http::{trace as tower_trace, cors::CorsLayer};
 
 use crate::{
     configs::Config,
@@ -53,14 +53,14 @@ where
         )
         .into_inner();
 
+    let cors = CorsLayer::permissive();
+
     let router = axum::Router::new()
         .nest("/user", routes::user::serve(app_state.clone()))
         .nest(
             "/transaction",
             routes::transaction::serve(app_state.clone()),
-        );
-
-    let router = router
+        )
         .layer(ratelimit_middleware)
         .layer(
             tower_trace::TraceLayer::new_for_http()
@@ -75,7 +75,8 @@ where
                         .latency_unit(tower_http::LatencyUnit::Micros)
                         .level(tracing::Level::ERROR),
                 ),
-        );
+        )
+        .layer(cors);
 
     let router = router
         .nest("/health", routes::health::serve())
