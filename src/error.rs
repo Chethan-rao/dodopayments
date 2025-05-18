@@ -137,7 +137,7 @@ impl axum::response::IntoResponse for ApiError {
             data @ Self::DatabaseInsertFailed(_)
             | data @ Self::DatabaseError
             | data @ Self::DatabaseDeleteFailed(_)
-            | data @ Self::DatabaseUpdationFailed((_))
+            | data @ Self::DatabaseUpdationFailed(_)
             | data @ Self::RetrieveDataFailed(_) => (
                 hyper::StatusCode::INTERNAL_SERVER_ERROR,
                 axum::Json(ApiErrorResponse::new(

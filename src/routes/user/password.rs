@@ -7,7 +7,6 @@ use error_stack::ResultExt;
 use crate::{
     error::container::{ContainerError, ResultContainerExt},
     routes::user::error::UserError,
-    types::Password,
 };
 
 pub fn generate_password_hash(password: String) -> Result<String, ContainerError<UserError>> {

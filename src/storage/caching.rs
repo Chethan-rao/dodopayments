@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::storage::{Storage, types};
+use crate::storage::types;
 
 pub(super) type Cache<T, U> =
     moka::future::Cache<<T as super::Cacheable<U>>::Key, Arc<<T as super::Cacheable<U>>::Value>>;

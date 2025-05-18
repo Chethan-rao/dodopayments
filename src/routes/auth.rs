@@ -6,7 +6,6 @@ use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode};
 
 use crate::{
     app::AppState,
-    consts,
     error::{
         ApiError,
         container::{ContainerError, ResultContainerExt},

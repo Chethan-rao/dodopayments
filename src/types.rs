@@ -1,16 +1,11 @@
 use error_stack::report;
-use jsonwebtoken::{EncodingKey, Header, encode};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    error::{
-        ValidationError,
-        container::{ContainerError, ResultContainerExt},
-    },
+    error::{ValidationError, container::ContainerError},
     logger,
-    routes::user::error::UserError,
 };
 
 pub const MAX_PASSWORD_LENGTH: usize = 70;

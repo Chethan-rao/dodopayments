@@ -89,12 +89,3 @@ where
         }
     }
 }
-
-macro_rules! error_transform {
-    ($a:ty => $b:ty) => {
-        impl crate::error::container::ErrorTransform<crate::error::container::ContainerError<$a>>
-            for crate::error::container::ContainerError<$b>
-        {
-        }
-    };
-}

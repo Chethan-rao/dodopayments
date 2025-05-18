@@ -4,7 +4,6 @@ pub mod password;
 use std::sync::Arc;
 
 use crate::{
-    consts,
     error::{
         ApiError,
         container::{ContainerError, ResultContainerExt},
@@ -13,7 +12,7 @@ use crate::{
     routes::{api_models, auth::AuthResolver},
     storage::{
         UserInterface,
-        types::{User, UserNew, UserUpdateInternal},
+        types::{UserNew, UserUpdateInternal},
     },
     types::Claims,
     utils,
@@ -23,12 +22,12 @@ use axum::{
     extract::State,
     routing::{get, post, put},
 };
-use error_stack::ResultExt;
-use hyper::HeaderMap;
+
+
 
 use crate::app::AppState;
 
-pub fn serve(app_state: Arc<AppState>) -> axum::Router<Arc<AppState>> {
+pub fn serve(_app_state: Arc<AppState>) -> axum::Router<Arc<AppState>> {
     let router = axum::Router::new()
         .route("/signup", post(sign_up))
         .route("/login", post(login))

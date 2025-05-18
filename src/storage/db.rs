@@ -1,5 +1,5 @@
-use diesel::{ExpressionMethods, QueryDsl, associations::HasTable};
-use diesel_async::{AsyncConnection, RunQueryDsl};
+use diesel::{ExpressionMethods, QueryDsl, };
+use diesel_async::{RunQueryDsl};
 use error_stack::ResultExt;
 
 use crate::{
@@ -7,8 +7,7 @@ use crate::{
         UserDbError,
         container::{ContainerError, ResultContainerExt},
     },
-    routes::user::error,
-    storage::{Storage, UserInterface, schema, types},
+    storage::{Storage, UserInterface,  types},
 };
 
 impl UserInterface for Storage {
@@ -16,18 +15,21 @@ impl UserInterface for Storage {
 
     async fn get_user_by_user_id(
         &self,
-        user_id: &str,
+        _user_id: &str,
     ) -> Result<super::types::User, ContainerError<Self::Error>> {
+        use diesel::result::Error;
+        use crate::storage::schema::users::dsl::*;
+
         let mut conn = self.get_conn().await.change_context(UserDbError::DBError)?;
 
-        let output: Result<types::User, diesel::result::Error> = types::User::table()
-            .filter(schema::users::user_id.eq(user_id))
+        let output: Result<types::User, diesel::result::Error> = users
+            .filter(user_id.eq(_user_id))
             .get_result(&mut conn)
             .await;
 
         let output = match output {
             Err(err) => match err {
-                diesel::result::Error::NotFound => {
+                Error::NotFound => {
                     Err(err).change_error(UserDbError::NotFoundError)
                 }
                 _ => Err(err).change_error(UserDbError::DBFilterError),
@@ -40,18 +42,21 @@ impl UserInterface for Storage {
 
     async fn get_user_by_email(
         &self,
-        email: &str,
+        _email: &str,
     ) -> Result<super::types::User, ContainerError<Self::Error>> {
+        use diesel::result::Error;
+        use crate::storage::schema::users::dsl::*;
+
         let mut conn = self.get_conn().await.change_context(UserDbError::DBError)?;
 
-        let output: Result<types::User, diesel::result::Error> = types::User::table()
-            .filter(schema::users::email.eq(email))
+        let output: Result<types::User, diesel::result::Error> = users
+            .filter(email.eq(_email))
             .get_result(&mut conn)
             .await;
 
         let output = match output {
             Err(err) => match err {
-                diesel::result::Error::NotFound => {
+                Error::NotFound => {
                     Err(err).change_error(UserDbError::NotFoundError)
                 }
                 _ => Err(err).change_error(UserDbError::DBFilterError),
@@ -66,9 +71,11 @@ impl UserInterface for Storage {
         &self,
         user: super::types::UserNew,
     ) -> Result<super::types::User, ContainerError<Self::Error>> {
+        use crate::storage::schema::users::dsl::*;
+
         let mut conn = self.get_conn().await.change_context(UserDbError::DBError)?;
 
-        let query = diesel::insert_into(types::User::table()).values(user);
+        let query = diesel::insert_into(users).values(user);
 
         Ok(query
             .get_result(&mut conn)
@@ -78,13 +85,15 @@ impl UserInterface for Storage {
 
     async fn update_user(
         &self,
-        user_id: &str,
+        _user_id: &str,
         user_update: super::types::UserUpdateInternal,
     ) -> Result<super::types::User, ContainerError<Self::Error>> {
+        use crate::storage::schema::users::dsl::*;
+
         let mut conn = self.get_conn().await.change_context(UserDbError::DBError)?;
 
-        let query = diesel::update(types::User::table())
-            .filter(schema::users::user_id.eq(user_id))
+        let query = diesel::update(users)
+            .filter(user_id.eq(_user_id))
             .set(user_update);
 
         Ok(query
