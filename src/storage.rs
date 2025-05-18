@@ -95,7 +95,8 @@ pub trait UserInterface {
     ) -> Result<types::User, ContainerError<Self::Error>>;
     async fn update_user(
         &self,
-        user: types::UserNew,
+        user_id: &str,
+        user: types::UserUpdateInternal,
     ) -> Result<types::User, ContainerError<Self::Error>>;
 }
 

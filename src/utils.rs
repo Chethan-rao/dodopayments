@@ -51,3 +51,12 @@ where
     )
     .change_error(UserError::InternalServerError)
 }
+
+pub mod datetime {
+    use time::{OffsetDateTime, PrimitiveDateTime};
+
+    pub fn now() -> PrimitiveDateTime {
+        let utc_date_time: OffsetDateTime = OffsetDateTime::now_utc();
+        PrimitiveDateTime::new(utc_date_time.date(), utc_date_time.time())
+    }
+}

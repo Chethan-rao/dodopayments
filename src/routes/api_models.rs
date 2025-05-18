@@ -65,3 +65,46 @@ pub struct GetUserResponse {
     pub created_at: String,
     pub last_modified_at: String,
 }
+
+#[derive(Serialize, Default, Deserialize, Debug)]
+pub struct UpdateUserRequest {
+    pub name: Option<String>,
+    pub amount: Option<f64>,
+}
+
+impl UpdateUserRequest {
+    pub fn validate(&self) -> Result<(), ContainerError<ValidationError>> {
+        if self.name.is_none() && self.amount.is_none() {
+            return Err(ValidationError::InvalidValue {
+                message: "At least one of name or amount must be provided for update".into(),
+            }
+            .into());
+        }
+        if let Some(amount) = self.amount {
+            if amount < 0.0 {
+                return Err(ValidationError::InvalidValue {
+                    message: "Amount cannot be negative".into(),
+                }
+                .into());
+            }
+        }
+
+        if let Some(name) = &self.name {
+            if name.is_empty() {
+                return Err(ValidationError::InvalidValue {
+                    message: "Name cannot be empty".into(),
+                }
+                .into());
+            }
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Serialize, Default, Deserialize, Debug)]
+pub struct UpdateUserResponse {
+    pub user_id: String,
+    pub name: String,
+    pub balance_in_rs: f64,
+}

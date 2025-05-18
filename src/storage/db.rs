@@ -78,8 +78,18 @@ impl UserInterface for Storage {
 
     async fn update_user(
         &self,
-        user: super::types::UserNew,
+        user_id: &str,
+        user_update: super::types::UserUpdateInternal,
     ) -> Result<super::types::User, ContainerError<Self::Error>> {
-        todo!()
+        let mut conn = self.get_conn().await.change_context(UserDbError::DBError)?;
+
+        let query = diesel::update(types::User::table())
+            .filter(schema::users::user_id.eq(user_id))
+            .set(user_update);
+
+        Ok(query
+            .get_result(&mut conn)
+            .await
+            .change_error(UserDbError::DBUpdateError)?)
     }
 }

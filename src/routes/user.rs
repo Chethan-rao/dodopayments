@@ -12,7 +12,7 @@ use crate::{
     routes::{api_models, auth::AuthResolver},
     storage::{
         UserInterface,
-        types::{User, UserNew},
+        types::{User, UserNew, UserUpdateInternal},
     },
     types::Claims,
     utils,
@@ -31,8 +31,8 @@ pub fn serve(app_state: Arc<AppState>) -> axum::Router<Arc<AppState>> {
     let router = axum::Router::new()
         .route("/signup", post(sign_up))
         .route("/login", post(login))
-        .route("/", get(get_user_profile));
-    // .route("/:user_id", put(update_user_profile));
+        .route("/", get(get_user_profile))
+        .route("/", put(update_user));
 
     router
 }
@@ -101,3 +101,29 @@ async fn get_user_profile(
     Ok(Json(user.into()))
 }
 
+async fn update_user(
+    State(app_state): State<Arc<AppState>>,
+    AuthResolver(user_info): AuthResolver,
+    Json(update_request): Json<api_models::UpdateUserRequest>,
+) -> Result<Json<api_models::UpdateUserResponse>, ContainerError<ApiError>> {
+    update_request
+        .validate()
+        .change_error(ApiError::ValidationError)?;
+
+    let user = app_state
+        .db
+        .get_user_by_user_id(&user_info.user_id)
+        .await
+        .change_error(ApiError::NotFoundError("user"))?;
+
+    let updated_user = app_state
+        .db
+        .update_user(
+            &user.user_id,
+            UserUpdateInternal::new(update_request.name, update_request.amount),
+        )
+        .await
+        .change_error(ApiError::DatabaseUpdationFailed("users"))?;
+
+    Ok(Json(updated_user.into()))
+}

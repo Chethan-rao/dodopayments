@@ -64,3 +64,13 @@ impl From<storage::types::User> for api_models::GetUserResponse {
         }
     }
 }
+
+impl From<storage::types::User> for api_models::UpdateUserResponse {
+    fn from(value: storage::types::User) -> Self {
+        Self {
+            user_id: value.user_id,
+            name: value.name,
+            balance_in_rs: value.balance_in_rs,
+        }
+    }
+}

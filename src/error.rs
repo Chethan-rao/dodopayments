@@ -61,6 +61,9 @@ pub enum ApiError {
     #[error("failed while deleting data from {0}")]
     DatabaseDeleteFailed(&'static str),
 
+    #[error("failed while updating data from {0}")]
+    DatabaseUpdationFailed(&'static str),
+
     #[error("Something went wrong: {0}")]
     UnknownError(&'static str),
 
@@ -134,6 +137,7 @@ impl axum::response::IntoResponse for ApiError {
             data @ Self::DatabaseInsertFailed(_)
             | data @ Self::DatabaseError
             | data @ Self::DatabaseDeleteFailed(_)
+            | data @ Self::DatabaseUpdationFailed((_))
             | data @ Self::RetrieveDataFailed(_) => (
                 hyper::StatusCode::INTERNAL_SERVER_ERROR,
                 axum::Json(ApiErrorResponse::new(
