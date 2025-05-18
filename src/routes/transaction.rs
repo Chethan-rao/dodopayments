@@ -45,11 +45,11 @@ async fn create_transaction(
 ) -> Result<impl IntoResponse, ContainerError<ApiError>> {
     payload.validate().change_error(ApiError::ValidationError)?;
 
-    let transaction_id = generate_nano_id(10);
+    let transaction_id = generate_nano_id(20);
     let created_at = datetime::now();
 
     let new_transaction = types::NewTransaction {
-        transaction_id: transaction_id.clone(),
+        transaction_id: format!("txn_{}", transaction_id.clone()),
         sender_id: payload.sender_id,
         recipient_id: payload.receiver_id,
         amount_in_rs: payload.amount,

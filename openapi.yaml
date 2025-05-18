@@ -139,6 +139,97 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
+  /transaction:
+    post:
+      tags:
+        - Transaction
+      summary: Create a new transaction
+      description: |
+        Endpoint for creating a new transaction.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransactionRequest"
+      responses:
+        "201":
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTransactionResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+    get:
+      tags:
+        - Transaction
+      summary: List transactions
+      description: |
+        Endpoint for listing transactions with pagination.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - in: query
+          name: page_size
+          schema:
+            type: integer
+            default: 10
+          description: Page size
+      responses:
+        "200":
+          description: Transactions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListTransactionsResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+  /transaction/{transaction_id}:
+    get:
+      tags:
+        - Transaction
+      summary: Get transaction by ID
+      description: |
+        Endpoint for retrieving a transaction by its ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: transaction_id
+          required: true
+          schema:
+            type: string
+          description: The ID of the transaction to retrieve
+      responses:
+        "200":
+          description: Transaction retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetTransactionResponse"
+        "404":
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
 components:
   securitySchemes:
     bearerAuth:
@@ -255,3 +346,55 @@ components:
         data:
           type: object
           nullable: true
+    CreateTransactionRequest:
+      type: object
+      properties:
+        sender_id:
+          type: string
+          example: user_id
+        receiver_id:
+          type: string
+          example: user_id
+        amount:
+          type: number
+          format: double
+          example: 10.0
+      required:
+        - sender_id
+        - receiver_id
+        - amount
+    GetTransactionResponse:
+      type: object
+      properties:
+        transaction_id:
+          type: string
+          example: transaction_id
+        sender_id:
+          type: string
+          example: user_id
+        receiver_id:
+          type: string
+          example: user_id
+        amount:
+          type: number
+          format: double
+          example: 10.0
+        created_at:
+          type: string
+          example: "2024-01-01T00:00:00Z"
+    ListTransactionsResponse:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetTransactionResponse"
+        total_count:
+          type: integer
+          example: 100
+        page:
+          type: integer
+          example: 1
+        page_size:
+          type: integer
+          example: 10

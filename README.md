@@ -7,7 +7,7 @@ dodopayments is a backend application for managing users and transactions. It pr
 ## Features
 
 *   User registration and authentication
-*   Transaction creation and management
+*   Transaction creation and management. The transactions endpoint has database transactions enabled, so if anything goes wrong, it will be rolled back.
 
 ## Rate Limiting
 
