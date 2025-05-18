@@ -6,9 +6,12 @@ use crate::{
         ApiError,
         container::{ContainerError, ResultContainerExt},
     },
-    routes::api_models::{
-        CreateTransactionRequest, GetTransactionResponse, ListTransactionsRequest,
-        ListTransactionsResponse,
+    routes::{
+        api_models::{
+            CreateTransactionRequest, GetTransactionResponse, ListTransactionsRequest,
+            ListTransactionsResponse,
+        },
+        auth::AuthResolver,
     },
     storage::{
         TransactionInterface,
@@ -37,6 +40,7 @@ pub fn serve(app_state: Arc<AppState>) -> Router<Arc<AppState>> {
 /// Creates a new transaction.
 async fn create_transaction(
     State(app_state): State<Arc<AppState>>,
+    AuthResolver(claims): AuthResolver,
     Json(payload): Json<CreateTransactionRequest>,
 ) -> Result<impl IntoResponse, ContainerError<ApiError>> {
     payload.validate().change_error(ApiError::ValidationError)?;
@@ -76,6 +80,7 @@ async fn create_transaction(
 async fn get_transaction(
     State(app_state): State<Arc<AppState>>,
     Path(transaction_id): Path<String>,
+    AuthResolver(claims): AuthResolver,
 ) -> Result<impl IntoResponse, ContainerError<ApiError>> {
     let transaction = app_state
         .db
@@ -98,12 +103,13 @@ async fn get_transaction(
 async fn list_transactions(
     State(app_state): State<Arc<AppState>>,
     Query(params): Query<ListTransactionsRequest>,
+    AuthResolver(claims): AuthResolver,
 ) -> Result<impl IntoResponse, ContainerError<ApiError>> {
     use crate::error::container::ResultContainerExt;
 
     let page = params.page.unwrap_or(1);
     let page_size = params.page_size.unwrap_or(10);
-    let user_id = &params.user_id;
+    let user_id = &claims.user_id;
 
     let (transactions, total_count) =
         get_paginated_transactions(app_state.clone(), user_id, page, page_size)

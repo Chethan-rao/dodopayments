@@ -124,9 +124,4 @@ pub trait TransactionInterface {
         &self,
         transaction: types::NewTransaction,
     ) -> Result<types::Transaction, ContainerError<Self::Error>>;
-    /// Update transaction
-    async fn update_transaction(
-        &self,
-        transaction: types::NewTransaction,
-    ) -> Result<types::Transaction, ContainerError<Self::Error>>;
 }

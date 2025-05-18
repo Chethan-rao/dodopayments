@@ -168,7 +168,6 @@ pub struct GetTransactionResponse {
 /// Represents the list transactions request query parameters.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ListTransactionsRequest {
-    pub user_id: String,
     pub page: Option<u64>,
     pub page_size: Option<u64>,
 }

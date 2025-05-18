@@ -180,6 +180,20 @@ impl TransactionInterface for Storage {
                         return Err(Error::NotFound);
                     }
 
+                    // Check if sender has enough balance
+                    use diesel::dsl::sum;
+                    use diesel::select;
+
+                    let sender_balance = users
+                        .filter(user_id.eq(transaction.sender_id.clone()))
+                        .select(balance_in_rs)
+                        .first::<f64>(conn)
+                        .await?;
+
+                    if sender_balance < transaction.amount_in_rs {
+                        return Err(Error::NotFound);
+                    }
+
                     // Debit sender
                     diesel::update(users)
                         .filter(user_id.eq(transaction.sender_id.clone()))
@@ -211,13 +225,5 @@ impl TransactionInterface for Storage {
             }
             Err(err) => Err(err).change_error(TransactionDbError::DBInsertError)?,
         }
-    }
-
-    /// Updates an existing transaction in the database.
-    async fn update_transaction(
-        &self,
-        _transaction: super::types::NewTransaction,
-    ) -> Result<super::types::Transaction, ContainerError<Self::Error>> {
-        todo!()
     }
 }
